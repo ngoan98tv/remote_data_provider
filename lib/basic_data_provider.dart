@@ -7,12 +7,20 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   T _data;
   bool _isLoading;
   dynamic _error;
+  bool _isMounted;
 
   BasicDataProvider() {
     _data = null;
     _error = null;
     _isLoading = true;
+    _isMounted = true;
     _makeData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _isMounted = false;
   }
 
   /// Get `loading` status
@@ -34,7 +42,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   Future<void> refresh() async {
     _error = null;
     _isLoading = true;
-    notifyListeners();
+    if (_isMounted) notifyListeners();
     await _makeData();
   }
 
@@ -56,13 +64,13 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   void _setError(value) {
     _error = value;
     _isLoading = false;
-    notifyListeners();
+    if (_isMounted) notifyListeners();
   }
 
   /// set data and turn off loading then notify listeners
   void _setData(value) {
     _data = value;
     _isLoading = false;
-    notifyListeners();
+    if (_isMounted) notifyListeners();
   }
 }
