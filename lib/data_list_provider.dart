@@ -2,15 +2,15 @@ library remote_data_provider;
 
 import 'package:flutter/foundation.dart';
 
-/// A basic provider to provide a single data object with type `T`
-abstract class BasicDataProvider<T> with ChangeNotifier {
-  T _data;
+/// A provider to provide a list of data with type `T`
+abstract class DataListProvider<T> with ChangeNotifier {
+  List<T> _data;
   bool _isLoading;
   dynamic _error;
   bool _isMounted;
 
-  BasicDataProvider() {
-    _data = null;
+  DataListProvider() {
+    _data = List();
     _error = null;
     _isLoading = true;
     _isMounted = true;
@@ -33,10 +33,10 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   dynamic get error => _error;
 
   /// Get value `data`
-  T get data => _data;
+  List<T> get data => _data;
 
   /// Get status of `data`. Return `true` if `data == null`.
-  bool get isEmpty => _data == null;
+  bool get isEmpty => _data.isEmpty;
 
   /// Refresh value of `data` by recall `fetchData`
   Future<void> refresh() async {
@@ -49,7 +49,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   /// Fetch data from your APIs or files asynchronous.
   /// You will need to throw an error when this process is failed
   /// to make `isError` work properly or simply omit the try-catch statements here.
-  Future<T> fetchData();
+  Future<List<T>> fetchData();
 
   Future<void> _makeData() async {
     try {
@@ -68,7 +68,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   }
 
   /// set data and turn off loading then notify listeners
-  void _setData(value) {
+  void _setData(List<T> value) {
     _data = value;
     _isLoading = false;
     if (_isMounted) notifyListeners();
