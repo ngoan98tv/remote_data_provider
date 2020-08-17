@@ -1,8 +1,9 @@
+import 'package:example/providers/user_list_provider.dart';
+import 'package:example/providers/user_provider.dart';
+import 'package:example/views/user_item.dart';
+import 'package:example/views/user_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:remote_data_provider/basic_data_provider.dart';
-import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
 
 void main() {
   runApp(MyApp());
@@ -34,6 +35,9 @@ class MyHomePage extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => UserProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (context) => UserListProvider(),
+        ),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -46,15 +50,25 @@ class MyHomePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.all(28.0),
+                  padding: const EdgeInsets.all(18.0),
                   child: Text(
                     'BasicDataProvider<T>',
                     style: Theme.of(context).textTheme.headline5,
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
                   child: _userDetailWidget,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Text(
+                    'DataListProvider<T>',
+                    style: Theme.of(context).textTheme.headline5,
+                  ),
+                ),
+                Expanded(
+                  child: _userListWidget,
                 ),
               ],
             );
@@ -83,48 +97,30 @@ class MyHomePage extends StatelessWidget {
           child: Text("No user data found."),
         );
 
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: _user.data.keys
-            .map(
-              (key) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(key),
-                  Text(_user.data[key].toString()),
-                ],
-              ),
-            )
-            .toList()
-              ..add(
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 18.0),
-                      child: RaisedButton(
-                        onPressed: () {
-                          _user.refresh();
-                        },
-                        child: Text("Refresh"),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-      );
+      return UserItem(data: _user.data);
     },
   );
-}
 
-class UserProvider extends BasicDataProvider<Map<String, dynamic>> {
-  @override
-  Future<Map<String, dynamic>> fetchData() async {
-    // simulate loading state
-    await Future.delayed(const Duration(seconds: 3));
+  final _userListWidget = Builder(
+    builder: (context) {
+      final _userList = Provider.of<UserListProvider>(context);
 
-    final json = await rootBundle.loadString("assets/user.json");
-    return jsonDecode(json);
-  }
+      if (_userList.isLoading)
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+
+      if (_userList.isError)
+        return Center(
+          child: Text("${_userList.error}"),
+        );
+
+      if (_userList.isEmpty)
+        return Center(
+          child: Text("No user data found."),
+        );
+
+      return UserList(data: _userList.data);
+    },
+  );
 }

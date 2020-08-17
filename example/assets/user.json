@@ -1,6 +1,4 @@
 {
     "id": 123,
-    "name": "John Doe",
-    "birthday": "01-01-1998",
-    "about": "A normal user in the app."
+    "name": "John Doe"
 }
