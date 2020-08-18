@@ -1,14 +1,37 @@
-# remote_data_provider
+# Remote Data Provider
 
-A new Flutter package project.
+Help implementing providers easier with predefined abstract classes, special is for working with remote data.
 
-## Getting Started
+## Usage
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+### Single Data Object
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+```dart
+import 'package:remote_data_provider/basic_data_provider.dart';
+
+class /*ProviderName*/ extends BasicDataProvider</*DataType*/> {
+  @override
+  Future</*DataType*/> fetchData() async {
+    
+    // Fetch data from API or database or read from files.
+
+    return /*FetchedData*/;
+  }
+}
+```
+
+### A List of Data Object
+
+```dart
+import 'package:remote_data_provider/data_list_provider.dart';
+
+class /*ProviderName*/ extends DataListProvider</*DataType*/> {
+  @override
+  Future<List</*DataType*/>> fetchData() async {
+    
+    // Fetch data from API or database or read from files.
+    
+    return /*FetchedData*/;
+  }
+}
+```

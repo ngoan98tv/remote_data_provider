@@ -1,8 +1,8 @@
 name: remote_data_provider
-description: A new Flutter package project.
+description: Help implementing providers easier with predefined abstract classes, special is for working with remote data.
 version: 0.0.1
 author: ngoan98travinh@gmail.com
-homepage: 
+homepage: https://github.com/ngoan98tv/remote_data_provider
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
