@@ -1,5 +1,3 @@
-library remote_data_provider;
-
 import 'package:flutter/foundation.dart';
 
 /// A provider to provide a list of data with type `T`

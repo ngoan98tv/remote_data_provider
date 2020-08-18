@@ -1,5 +1,3 @@
-library remote_data_provider;
-
 import 'package:flutter/foundation.dart';
 
 /// A basic provider to provide a single data object with type `T`
