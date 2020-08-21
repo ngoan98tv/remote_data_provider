@@ -44,7 +44,8 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Get status of `data`. Return `true` if `data == null`.
   bool get isEmpty => _data.isEmpty;
 
-  /// Refresh value of `data` by recall `fetch`
+  /// Refresh value of `data` by recall `fetch`.
+  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
   Future<void> refresh({bool isQuiet = false}) async {
     _error = null;
     _isLoading = true;
@@ -53,13 +54,13 @@ abstract class DataListProvider<T> with ChangeNotifier {
   }
 
   /// Called when trying to fetch data for initial or on refreshing.
-  /// You have to return a list of data as the result, 
+  /// Must return a list of data as the result, 
   /// or throw an `error` when it's failed to fetch.
   @protected
   Future<List<T>> onFetch();
 
   /// Called when trying to add a new item, 
-  /// you have to return the added item, 
+  /// Must return the added item, 
   /// or throw an `error` if it's failed to add.
   @protected
   Future<T> onAdd(T newItem) async {
@@ -67,7 +68,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   }
 
   /// Called when trying to remove an item.
-  /// You have to return the removed item,
+  /// Must return the removed item,
   /// or throw an `error` when it's failed to remove.
   @protected
   Future<int> onRemove(int index) async {
@@ -75,6 +76,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   }
 
   /// Add a new item to the end of data list.
+  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
   Future<void> add(T newItem, {bool isQuiet = false}) async {
     _error = null;
     _isAdding = true;
@@ -92,6 +94,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   }
 
   /// Remove the item at `index`.
+  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
   Future<void> removeAt(int index, {bool isQuiet = false}) async {
     _error = null;
     _isRemoving = true;

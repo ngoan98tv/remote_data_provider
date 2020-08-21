@@ -36,7 +36,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   /// Get status of `data`. Return `true` if `data == null`.
   bool get isEmpty => _data == null;
 
-  /// Refresh value of `data` by recall `fetchData`
+  /// Refresh value of `data` by recall `fetch` data.
   Future<void> refresh({bool isQuiet = false}) async {
     _error = null;
     _isLoading = true;
@@ -44,18 +44,20 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
     await _fetchData();
   }
 
-  /// Fetch data from your APIs or databases.
-  /// You will need to throw an error when this process is failed
-  /// to make `isError` work properly or simply omit the try-catch statements here.
+  /// Called when trying to fetch data.
+  /// Must return the fetched data or throw an `error` if it's failed to fetch.
   @protected
   Future<T> onFetch();
 
-  /// Update data to your APIs or databases
+  /// Called when trying to update the data.
+  /// Must return the new data, or throw and `error` when it's failed to update.
   @protected
   Future<T> onUpdate(T newData) async {
     return newData;
   }
 
+  /// Update data by `newData`.
+  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
   Future<void> update(T newData, {bool isQuiet = false}) async {
     _error = null;
     _isLoading = true;
