@@ -3,26 +3,39 @@ import 'dart:io';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart';
 
+/// Extend from `BaseClient`, adding caching and timeout features.
 class ExtendedHttp extends BaseClient {
   final Client _client;
   Map<String, String> _headers;
-  Duration _timeout;
-  bool _networkFirst;
+  Duration _timeout = const Duration(seconds: 60);
+  bool _networkFirst = true;
 
   static final _instance = ExtendedHttp._internal(Client());
 
-  factory ExtendedHttp({
-    Duration timeout = const Duration(seconds: 60),
-    bool networkFirst = true,
-    Map<String, String> headers,
-  }) {
-    _instance._networkFirst = networkFirst;
-    _instance._timeout = timeout;
-    _instance._headers = headers;
+  factory ExtendedHttp() {
     return _instance;
   }
 
   ExtendedHttp._internal(this._client);
+
+  /// Override `ExtendedHttp` config
+  ///
+  /// `timeout` -- Request timeout, default `60 seconds`.
+  ///
+  /// `networkFirst` -- If `true`, fetch data from network first,
+  /// then if failed, try get from cache. Versa if `false`.
+  /// Only work with `GET` requests, default `true`.
+  ///
+  /// `headers` -- Custom request headers.
+  void config({
+    Duration timeout = const Duration(seconds: 60),
+    bool networkFirst = true,
+    Map<String, String> headers,
+  }) {
+    _networkFirst = networkFirst;
+    _timeout = timeout;
+    _headers = headers;
+  }
 
   @override
   Future<StreamedResponse> send(BaseRequest req) async {
