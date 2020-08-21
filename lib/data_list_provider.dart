@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 abstract class DataListProvider<T> with ChangeNotifier {
   List<T> _data;
   bool _isLoading;
+  bool _isAdding;
+  bool _isRemoving;
   dynamic _error;
   bool _isMounted;
 
@@ -12,7 +14,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
     _error = null;
     _isLoading = true;
     _isMounted = true;
-    _makeData();
+    _fetchData();
   }
 
   @override
@@ -24,10 +26,16 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Get `loading` status
   bool get isLoading => _isLoading;
 
-  /// Get `error` status
+  /// Check if it's `adding` new item or not
+  bool get isAdding => _isAdding;
+
+  /// Check if it's `removing` an item or not
+  bool get isRemoving => _isRemoving;
+
+  /// Get current `error` status
   bool get isError => _error != null;
 
-  /// Get `error` value
+  /// Get latest `error` value
   dynamic get error => _error;
 
   /// Get value `data`
@@ -36,22 +44,73 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Get status of `data`. Return `true` if `data == null`.
   bool get isEmpty => _data.isEmpty;
 
-  /// Refresh value of `data` by recall `fetchData`
-  Future<void> refresh() async {
+  /// Refresh value of `data` by recall `fetch`
+  Future<void> refresh({bool isQuiet = false}) async {
     _error = null;
     _isLoading = true;
-    if (_isMounted) notifyListeners();
-    await _makeData();
+    if (_isMounted && !isQuiet) notifyListeners();
+    await _fetchData();
   }
 
-  /// Fetch data from your APIs or files asynchronous.
-  /// You will need to throw an error when this process is failed
-  /// to make `isError` work properly or simply omit the try-catch statements here.
-  Future<List<T>> fetchData();
+  /// Called when trying to fetch data for initial or on refreshing.
+  /// You have to return a list of data as the result, 
+  /// or throw an `error` when it's failed to fetch.
+  @protected
+  Future<List<T>> onFetch();
 
-  Future<void> _makeData() async {
+  /// Called when trying to add a new item, 
+  /// you have to return the added item, 
+  /// or throw an `error` if it's failed to add.
+  @protected
+  Future<T> onAdd(T newItem) async {
+    return newItem;
+  }
+
+  /// Called when trying to remove an item.
+  /// You have to return the removed item,
+  /// or throw an `error` when it's failed to remove.
+  @protected
+  Future<int> onRemove(int index) async {
+    return index;
+  }
+
+  /// Add a new item to the end of data list.
+  Future<void> add(T newItem, {bool isQuiet = false}) async {
+    _error = null;
+    _isAdding = true;
+    if (_isMounted && !isQuiet) notifyListeners();
+
     try {
-      final result = await fetchData();
+      final result = await onAdd(newItem);
+      _data.add(result);
+      _isAdding = false;
+      if (_isMounted && !isQuiet) notifyListeners();
+    } catch (e) {
+      _isAdding = false;
+      _setError(e);
+    }
+  }
+
+  /// Remove the item at `index`.
+  Future<void> removeAt(int index, {bool isQuiet = false}) async {
+    _error = null;
+    _isRemoving = true;
+    if (_isMounted && !isQuiet) notifyListeners();
+
+    try {
+      final result = await onRemove(index);
+      _data.removeAt(result);
+      _isRemoving = false;
+      if (_isMounted && !isQuiet) notifyListeners();
+    } catch (e) {
+      _isRemoving = false;
+      _setError(e);
+    }
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      final result = await onFetch();
       _setData(result);
     } catch (e) {
       _setError(e);
