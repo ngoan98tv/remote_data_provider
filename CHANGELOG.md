@@ -1,3 +1,6 @@
+## [0.1.2] - Aug 21, 2020.
+Update README
+
 ## [0.1.1] - Aug 21, 2020.
 
 `BasicDataProvider`: Rename `fetchData` to `onFetch`, Add `update`, `onUpdate` method, update docs.
