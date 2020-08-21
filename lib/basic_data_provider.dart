@@ -12,7 +12,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
     _error = null;
     _isLoading = true;
     _isMounted = true;
-    _makeData();
+    _fetchData();
   }
 
   @override
@@ -37,21 +37,39 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   bool get isEmpty => _data == null;
 
   /// Refresh value of `data` by recall `fetchData`
-  Future<void> refresh() async {
+  Future<void> refresh({bool isQuiet = false}) async {
     _error = null;
     _isLoading = true;
-    if (_isMounted) notifyListeners();
-    await _makeData();
+    if (_isMounted && !isQuiet) notifyListeners();
+    await _fetchData();
   }
 
-  /// Fetch data from your APIs or files asynchronous.
+  /// Fetch data from your APIs or databases.
   /// You will need to throw an error when this process is failed
   /// to make `isError` work properly or simply omit the try-catch statements here.
-  Future<T> fetchData();
+  @protected
+  Future<T> onFetch();
 
-  Future<void> _makeData() async {
+  /// Update data to your APIs or databases
+  @protected
+  Future<T> onUpdate(T newData);
+
+  Future<void> update(T newData, {bool isQuiet = false}) async {
+    _error = null;
+    _isLoading = true;
+    if (_isMounted && !isQuiet) notifyListeners();
+
     try {
-      final result = await fetchData();
+      final result = await onUpdate(newData);
+      _setData(result);
+    } catch (e) {
+      _setError(e);
+    }
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      final result = await onFetch();
       _setData(result);
     } catch (e) {
       _setError(e);

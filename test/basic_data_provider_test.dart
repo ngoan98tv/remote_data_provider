@@ -11,7 +11,12 @@ void main() {
 
 class TestProvider extends BasicDataProvider {
   @override
-  Future fetchData() async {
+  Future onFetch() async {
+    return null;
+  }
+
+  @override
+  Future onUpdate(newData) {
     return null;
   }
 }
