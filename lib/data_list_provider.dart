@@ -54,13 +54,13 @@ abstract class DataListProvider<T> with ChangeNotifier {
   }
 
   /// Called when trying to fetch data for initial or on refreshing.
-  /// Must return a list of data as the result, 
+  /// Must return a list of data as the result,
   /// or throw an `error` when it's failed to fetch.
   @protected
   Future<List<T>> onFetch();
 
-  /// Called when trying to add a new item, 
-  /// Must return the added item, 
+  /// Called when trying to add a new item,
+  /// Must return the added item,
   /// or throw an `error` if it's failed to add.
   @protected
   Future<T> onAdd(T newItem) async {
