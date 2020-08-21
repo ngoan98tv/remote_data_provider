@@ -52,7 +52,9 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
 
   /// Update data to your APIs or databases
   @protected
-  Future<T> onUpdate(T newData);
+  Future<T> onUpdate(T newData) async {
+    return newData;
+  }
 
   Future<void> update(T newData, {bool isQuiet = false}) async {
     _error = null;
