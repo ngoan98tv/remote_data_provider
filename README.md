@@ -3,6 +3,8 @@
 ![Test](https://github.com/ngoan98tv/remote_data_provider/workflows/Test/badge.svg)
 ![DryRun](https://github.com/ngoan98tv/remote_data_provider/workflows/Pub%20Dry%20Run/badge.svg)
 ![Publish](https://github.com/ngoan98tv/remote_data_provider/workflows/Publish/badge.svg)
+![PubVersion](https://img.shields.io/pub/v/remote_data_provider)
+![Issues](https://img.shields.io/github/issues/ngoan98tv/remote_data_provider)
 
 Help implementing providers easier with predefined abstract classes, special is for working with remote data.
 
