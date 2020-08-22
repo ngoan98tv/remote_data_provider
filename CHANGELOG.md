@@ -1,3 +1,6 @@
+## [0.1.3] - Aug 22, 2020.
+Update Readme and setup CI testing.
+
 ## [0.1.2] - Aug 21, 2020.
 Update README
 

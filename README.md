@@ -10,7 +10,7 @@ Help implementing providers easier with predefined abstract classes, special is 
 
 ### Single Data Object
 
-**Define your provider**
+**Step 1. Define your provider**
 
 ```dart
 import 'package:remote_data_provider/basic_data_provider.dart';
@@ -34,7 +34,7 @@ class ExampleProvider extends BasicDataProvider<ExampleType> {
 }
 ```
 
-**In the parent widget**
+**Step 2. In the parent widget**
 
 ```dart
 ChangeNotifierProvider(
@@ -43,7 +43,7 @@ ChangeNotifierProvider(
 )
 ```
 
-**In the `build` function of the child widget**
+**Step 3. In the `build` function of the child widget**
 
 ```dart
 final example = Provider.of<ExampleProvider>(context);
@@ -60,7 +60,7 @@ Future<void> update = example.update;
 
 ### A List of Data Object
 
-**Define your provider**
+**Step 1. Define your provider**
 
 ```dart
 import 'package:remote_data_provider/data_list_provider.dart';
@@ -93,7 +93,7 @@ class ExampleListProvider extends DataListProvider<ExampleType> {
 }
 ```
 
-**In the parent widget**
+**Step 2. In the parent widget**
 
 ```dart
 ChangeNotifierProvider(
@@ -102,7 +102,7 @@ ChangeNotifierProvider(
 )
 ```
 
-**In the `build` function of the child widget**
+**Step 3. In the `build` function of the child widget**
 
 ```dart
 final exampleList = Provider.of<ExampleListProvider>(context);
