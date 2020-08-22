@@ -1,5 +1,7 @@
 # Remote Data Provider
 
+![TESTS](https://github.com/ngoan98tv/remote_data_provider/workflows/Tests/badge.svg)
+
 Help implementing providers easier with predefined abstract classes, special is for working with remote data.
 
 ## Usage
