@@ -1,3 +1,9 @@
+## [0.1.5] - Aug 22, 2020.
+Add `ExtendedHttp` to example
+
+## [0.1.4] - Aug 22, 2020.
+Update tests
+
 ## [0.1.3] - Aug 22, 2020.
 Update Readme and setup CI testing.
 

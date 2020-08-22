@@ -7,4 +7,8 @@ class JsonHelper {
     final jsonString = await rootBundle.loadString(path);
     return jsonDecode(jsonString);
   }
+
+  static dynamic parseString(String data) {
+    return jsonDecode(data);
+  }
 }
