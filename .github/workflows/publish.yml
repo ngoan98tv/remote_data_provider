@@ -10,5 +10,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: subosito/flutter-action@v1
+    - run: mkdir ~/.pub-cache
     - run: echo secrets.PUB_CREDENTIALS > ~/.pub-cache/credentials.json
     - run: flutter pub publish --force
