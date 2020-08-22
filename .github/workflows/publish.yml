@@ -1,0 +1,15 @@
+name: Publish
+
+on:
+  push:
+    branches: [ pub ]
+  pull_request:
+    branches: [ pub ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: subosito/flutter-action@v1
+    - run: flutter pub publish --force
