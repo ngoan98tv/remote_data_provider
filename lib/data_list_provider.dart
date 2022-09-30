@@ -9,6 +9,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   bool _isMounted = false;
   dynamic _error;
 
+  /// `manual = true` mean don't fetch data at create time
   DataListProvider({bool manual = false}) {
     _isMounted = true;
     notifyListeners();
