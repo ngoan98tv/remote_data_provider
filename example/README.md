@@ -72,11 +72,11 @@ Future<void> removeAt = postList.removeAt;
 
 ```dart
 class PostDetailProvider extends BasicDataProvider<Post> {
-  late int _id;
+  final int _id;
 
-  PostDetailProvider({required int id}) {
-    _id = id;
-  }
+  PostDetailProvider({required int id})
+      : _id = id,
+        super();
 
   @override
   Future<Post> onFetch() async {
