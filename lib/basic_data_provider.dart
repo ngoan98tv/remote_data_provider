@@ -2,17 +2,19 @@ import 'package:flutter/foundation.dart';
 
 /// A basic provider to provide a single data object with type `T`
 abstract class BasicDataProvider<T> with ChangeNotifier {
-  T _data;
-  bool _isLoading;
+  T? _data;
+  bool _isLoading = false;
+  bool _isMounted = false;
   dynamic _error;
-  bool _isMounted;
 
-  BasicDataProvider() {
-    _data = null;
-    _error = null;
-    _isLoading = true;
+  BasicDataProvider({bool manual = false}) {
     _isMounted = true;
-    _fetchData();
+    notifyListeners();
+    if (!manual) {
+      _isLoading = true;
+      notifyListeners();
+      _fetchData();
+    }
   }
 
   @override
@@ -31,7 +33,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   dynamic get error => _error;
 
   /// Get value `data`
-  T get data => _data;
+  T? get data => _data;
 
   /// Get status of `data`. Return `true` if `data == null`.
   bool get isEmpty => _data == null;

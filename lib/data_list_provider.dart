@@ -2,19 +2,21 @@ import 'package:flutter/foundation.dart';
 
 /// A provider to provide a list of data with type `T`
 abstract class DataListProvider<T> with ChangeNotifier {
-  List<T> _data;
-  bool _isLoading;
-  bool _isAdding;
-  bool _isRemoving;
+  List<T> _data = List.empty(growable: true);
+  bool _isLoading = false;
+  bool _isAdding = false;
+  bool _isRemoving = false;
+  bool _isMounted = false;
   dynamic _error;
-  bool _isMounted;
 
-  DataListProvider() {
-    _data = List();
-    _error = null;
-    _isLoading = true;
+  DataListProvider({bool manual = false}) {
     _isMounted = true;
-    _fetchData();
+    notifyListeners();
+    if (!manual) {
+      _isLoading = true;
+      notifyListeners();
+      _fetchData();
+    }
   }
 
   @override

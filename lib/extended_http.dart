@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart';
 
 /// Extend from `BaseClient`, adding caching and timeout features.
 class ExtendedHttp extends BaseClient {
   final Client _client;
-  Map<String, String> _headers;
+  Map<String, String> _headers = {};
   Duration _timeout = const Duration(seconds: 60);
   bool _networkFirst = true;
+  String _baseURL = '';
 
   static final _instance = ExtendedHttp._internal(Client());
 
@@ -30,23 +32,40 @@ class ExtendedHttp extends BaseClient {
   void config({
     Duration timeout = const Duration(seconds: 60),
     bool networkFirst = true,
-    Map<String, String> headers,
+    Map<String, String>? headers,
+    String? baseURL,
   }) {
     _networkFirst = networkFirst;
     _timeout = timeout;
-    _headers = headers;
+    if (headers != null) {
+      _headers = headers;
+    }
+    if (baseURL != null) {
+      _baseURL = baseURL;
+    }
+  }
+
+  Uri createURI(String path, {Map<String, String>? params}) {
+    final u = Uri.parse(_baseURL + path);
+    return Uri(
+      scheme: u.scheme,
+      host: u.host,
+      port: u.port,
+      path: u.path,
+      queryParameters: params,
+    );
   }
 
   @override
-  Future<StreamedResponse> send(BaseRequest req) async {
-    if (_headers != null) req.headers.addAll(_headers);
+  Future<StreamedResponse> send(BaseRequest request) async {
+    request.headers.addAll(_headers);
 
-    if (req.method == "GET") {
+    if (request.method == "GET") {
       return _networkFirst
-          ? await _networkFirstRequest(req)
-          : await _cacheFirstRequest(req);
+          ? await _networkFirstRequest(request)
+          : await _cacheFirstRequest(request);
     } else {
-      return await _client.send(req).timeout(_timeout);
+      return await _client.send(request).timeout(_timeout);
     }
   }
 
@@ -55,7 +74,7 @@ class ExtendedHttp extends BaseClient {
     try {
       file = await _downloadFile(req);
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       file = await _readCachedFile(req);
     }
     return StreamedResponse(
