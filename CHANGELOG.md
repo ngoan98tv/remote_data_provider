@@ -1,3 +1,9 @@
+## [1.0.1] - Sept 30, 2022.
+
+Update README.md
+
+Move code in README.md to example
+
 ## [1.0.0] - Sept 30, 2022.
 
 Upgrade dependencies
