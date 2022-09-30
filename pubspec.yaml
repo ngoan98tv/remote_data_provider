@@ -1,10 +1,10 @@
 name: remote_data_provider
 description: Help implementing providers easier with predefined abstract classes, special is for working with remote data.
-version: 1.0.1
+version: 1.0.2
 homepage: https://github.com/ngoan98tv/remote_data_provider
 
 environment:
-  sdk: ">=2.18.1 <3.0.0"
+  sdk: ">=2.18.0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
