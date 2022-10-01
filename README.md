@@ -1,4 +1,4 @@
-# Remote Data Provider
+# Easy API Integration with Providers
 
 ![Test](https://github.com/ngoan98tv/remote_data_provider/workflows/Test/badge.svg)
 ![DryRun](https://github.com/ngoan98tv/remote_data_provider/workflows/Pub%20Dry%20Run/badge.svg)
@@ -6,11 +6,11 @@
 ![PubVersion](https://img.shields.io/pub/v/remote_data_provider)
 ![Issues](https://img.shields.io/github/issues/ngoan98tv/remote_data_provider)
 
-Help implementing providers easier with predefined abstract classes, special is for working with remote data.
+Help implementing providers easier with predefined abstract classes, special is for working with remote data like API.
 
 ## Features
 
-Work with RESTful APIs
+Work with any remote data provider such as REST API, GraphQL,...
 
 DataListProvider supports:
 
@@ -19,15 +19,16 @@ DataListProvider supports:
 
 BasicDataProvider supports:
 
-- Fetch/refresh data
-- Update data
+- Fetch/refresh data with predefined `isLoading` state
+- Update data with predefined `isUpdating` state
+- Delete data with predefined `isDeleting` state
 
 Extended HTTP supports:
 
 - Caching API response (for GET requests only)
 - Set request timeout
-- Set request headers (authorization token,...)
-- Set request baseURL (http:// yourhost .com /api)
+- Set request headers (such as: authorization token,...)
+- Set request baseURL (Ex: `http://yourhost.com/api`)
 
 See more in the example
 
