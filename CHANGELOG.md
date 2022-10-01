@@ -1,3 +1,11 @@
+## [1.1.2] - Oct 1, 2022.
+
+Basic data provider:
+
+- Added `delete` method which is corresponding with `isDeleting` and `isDeleted`
+- Now `update` method will trigger `isUpdating` state instead of `isLoading`
+- `isLoading` state will be triggered only on initialization and on `refresh`
+
 ## [1.0.2] - Sept 30, 2022.
 
 Update example

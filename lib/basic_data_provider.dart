@@ -59,7 +59,8 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
     await _fetchData();
   }
 
-  /// Refresh value of `data` by recall `fetch` data.
+  /// Delete current data
+  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
   Future<void> delete({bool isQuiet = false}) async {
     _error = null;
     _isDeleting = true;
