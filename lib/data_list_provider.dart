@@ -5,7 +5,8 @@ abstract class DataListProvider<T> with ChangeNotifier {
   List<T> _data = List.empty(growable: true);
   bool _isLoading = false;
   bool _isAdding = false;
-  bool _isRemoving = false;
+  bool _isUpdating = false;
+  bool _isDeleting = false;
   bool _isMounted = false;
   dynamic _error;
 
@@ -32,8 +33,11 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Check if it's `adding` new item or not
   bool get isAdding => _isAdding;
 
+  /// Check if it's `updating` a item or not
+  bool get isUpdating => _isUpdating;
+
   /// Check if it's `removing` an item or not
-  bool get isRemoving => _isRemoving;
+  bool get isDeleting => _isDeleting;
 
   /// Get current `error` status
   bool get isError => _error != null;
@@ -66,73 +70,93 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Must return the added item,
   /// or throw an `error` if it's failed to add.
   @protected
-  Future<T> onAdd(T newItem) async {
-    return newItem;
-  }
+  Future<T> onCreate(T newItem);
 
-  /// Called when trying to remove an item.
-  /// Must return the removed item,
-  /// or throw an `error` when it's failed to remove.
+  /// Called when trying to update the data.
+  /// Must return the new data, or throw and `error` when it's failed to update.
   @protected
-  Future<int> onRemove(int index) async {
-    return index;
-  }
+  Future<T> onUpdate(T newData);
+
+  /// Called when trying to delete the data.
+  /// Must return a boolean (`true` mean deleted), or throw and `error` when it's failed.
+  @protected
+  Future<bool> onDelete(T item);
 
   /// Add a new item to the end of data list.
+  ///
   /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
-  Future<void> add(T newItem, {bool isQuiet = false}) async {
+  ///
+  /// Set `addToTheStart = true` to add the new item to the start of the list, default `false`.
+  Future<void> add(
+    T newItem, {
+    bool isQuiet = false,
+    bool addToTheStart = false,
+  }) async {
     _error = null;
     _isAdding = true;
     if (_isMounted && !isQuiet) notifyListeners();
 
     try {
-      final result = await onAdd(newItem);
-      _data.add(result);
-      _isAdding = false;
-      if (_isMounted && !isQuiet) notifyListeners();
+      final result = await onCreate(newItem);
+      if (addToTheStart) {
+        _data.insert(0, result);
+      } else {
+        _data.add(result);
+      }
     } catch (e) {
-      _isAdding = false;
-      _setError(e);
+      _error = e;
     }
+
+    _isAdding = false;
+    if (_isMounted && !isQuiet) notifyListeners();
   }
 
   /// Remove the item at `index`.
   /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
   Future<void> removeAt(int index, {bool isQuiet = false}) async {
     _error = null;
-    _isRemoving = true;
+    _isDeleting = true;
     if (_isMounted && !isQuiet) notifyListeners();
 
     try {
-      final result = await onRemove(index);
-      _data.removeAt(result);
-      _isRemoving = false;
-      if (_isMounted && !isQuiet) notifyListeners();
+      final result = await onDelete(data[index]);
+      if (result) {
+        _data.removeAt(index);
+      }
     } catch (e) {
-      _isRemoving = false;
-      _setError(e);
+      _error = e;
     }
+
+    _isDeleting = false;
+    if (_isMounted && !isQuiet) notifyListeners();
+  }
+
+  /// Update data by `newData`.
+  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
+  Future<void> updateAt(int index, T newData, {bool isQuiet = false}) async {
+    _error = null;
+    _isUpdating = true;
+    if (_isMounted && !isQuiet) notifyListeners();
+
+    try {
+      final result = await onUpdate(newData);
+      _data[index] = result;
+    } catch (e) {
+      _error = e;
+    }
+
+    _isUpdating = false;
+    if (_isMounted && !isQuiet) notifyListeners();
   }
 
   Future<void> _fetchData() async {
     try {
       final result = await onFetch();
-      _setData(result);
+      _data = result;
     } catch (e) {
-      _setError(e);
+      _error = e;
     }
-  }
 
-  /// set error and turn off loading then notify listeners
-  void _setError(value) {
-    _error = value;
-    _isLoading = false;
-    if (_isMounted) notifyListeners();
-  }
-
-  /// set data and turn off loading then notify listeners
-  void _setData(List<T> value) {
-    _data = value;
     _isLoading = false;
     if (_isMounted) notifyListeners();
   }
