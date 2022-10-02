@@ -1,14 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:remote_data_provider/remote_list.dart';
 
 /// A provider to provide a list of data with type `T`
 abstract class DataListProvider<T> with ChangeNotifier {
-  List<T> _data = List.empty(growable: true);
+  RemoteList<T> _data = RemoteList(items: [], totalItem: 0);
+  dynamic _error;
+
   bool _isLoading = false;
   bool _isAdding = false;
   bool _isUpdating = false;
   bool _isDeleting = false;
   bool _isMounted = false;
-  dynamic _error;
+
+  Timer? _debounceTimer;
 
   /// `manual = true` mean don't fetch data at create time
   DataListProvider({bool manual = false}) {
@@ -23,8 +29,9 @@ abstract class DataListProvider<T> with ChangeNotifier {
 
   @override
   void dispose() {
-    super.dispose();
     _isMounted = false;
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 
   /// Get `loading` status
@@ -46,25 +53,82 @@ abstract class DataListProvider<T> with ChangeNotifier {
   dynamic get error => _error;
 
   /// Get value `data`
-  List<T> get data => _data;
+  List<T> get items => _data.items;
 
   /// Get status of `data`. Return `true` if `data == null`.
-  bool get isEmpty => _data.isEmpty;
+  bool get isEmpty => _data.items.isEmpty;
 
-  /// Refresh value of `data` by recall `fetch`.
-  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
-  Future<void> refresh({bool isQuiet = false}) async {
-    _error = null;
-    _isLoading = true;
-    if (_isMounted && !isQuiet) notifyListeners();
-    await _fetchData();
+  /// Get total available items
+  int get totalItem => _data.totalItem;
+
+  /// Get current page
+  int get page => _data.page;
+
+  /// Get current page size
+  int get pageSize => _data.pageSize;
+
+  /// Get current search value
+  String? get search => _data.search;
+
+  /// Get current sort options
+  List<SortOption>? get sortOptions => _data.sortOptions;
+
+  /// Set search value and refresh data
+  void setSearch(String val, {bool noRefresh = false, int debounceMs = 500}) {
+    _data.search = val;
+    notifyListeners();
+    if (noRefresh) return;
+    if (_debounceTimer?.isActive ?? false) _debounceTimer?.cancel();
+    _debounceTimer = Timer(Duration(milliseconds: debounceMs), refresh);
+  }
+
+  /// Set new page and refresh data
+  void setPage(int val, {bool noRefresh = false}) {
+    _data.page = val;
+    notifyListeners();
+    if (noRefresh) return;
+    refresh();
+  }
+
+  /// Go next page and refresh data
+  void nextPage({bool noRefresh = false}) {
+    if (_data.page >= _data.lastPage) return;
+    _data.page += 1;
+    notifyListeners();
+    if (noRefresh) return;
+    refresh();
+  }
+
+  /// Go previous page and refresh data
+  void prevPage({bool noRefresh = false}) {
+    if (_data.page <= 1) return;
+    _data.page -= 1;
+    notifyListeners();
+    if (noRefresh) return;
+    refresh();
+  }
+
+  /// Set new page size and refresh data
+  void setPageSize(int val, {bool noRefresh = false}) {
+    _data.pageSize = val;
+    notifyListeners();
+    if (noRefresh) return;
+    refresh();
+  }
+
+  /// Set new sorts and refresh data
+  void setSortOptions(List<SortOption> val, {bool noRefresh = false}) {
+    _data.sortOptions = val;
+    notifyListeners();
+    if (noRefresh) return;
+    refresh();
   }
 
   /// Called when trying to fetch data for initial or on refreshing.
   /// Must return a list of data as the result,
   /// or throw an `error` when it's failed to fetch.
   @protected
-  Future<List<T>> onFetch();
+  Future<RemoteList<T>> onFetch();
 
   /// Called when trying to add a new item,
   /// Must return the added item,
@@ -81,6 +145,15 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Must return a boolean (`true` mean deleted), or throw and `error` when it's failed.
   @protected
   Future<bool> onDelete(T item);
+
+  /// Refresh value of `data` by recall `fetch`.
+  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
+  Future<void> refresh({bool isQuiet = false}) async {
+    _error = null;
+    _isLoading = true;
+    if (_isMounted && !isQuiet) notifyListeners();
+    await _fetchData();
+  }
 
   /// Add a new item to the end of data list.
   ///
@@ -99,9 +172,11 @@ abstract class DataListProvider<T> with ChangeNotifier {
     try {
       final result = await onCreate(newItem);
       if (addToTheStart) {
-        _data.insert(0, result);
+        _data.items.insert(0, result);
+        _data.totalItem += 1;
       } else {
-        _data.add(result);
+        _data.items.add(result);
+        _data.totalItem += 1;
       }
     } catch (e) {
       _error = e;
@@ -119,9 +194,10 @@ abstract class DataListProvider<T> with ChangeNotifier {
     if (_isMounted && !isQuiet) notifyListeners();
 
     try {
-      final result = await onDelete(data[index]);
+      final result = await onDelete(items[index]);
       if (result) {
-        _data.removeAt(index);
+        _data.items.removeAt(index);
+        _data.totalItem -= 1;
       }
     } catch (e) {
       _error = e;
@@ -140,7 +216,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
 
     try {
       final result = await onUpdate(newData);
-      _data[index] = result;
+      _data.items[index] = result;
     } catch (e) {
       _error = e;
     }

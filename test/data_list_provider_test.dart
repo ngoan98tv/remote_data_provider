@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:remote_data_provider/data_list_provider.dart';
+import 'package:remote_data_provider/remote_list.dart';
 
 void main() {
   test('data list provider on init', () async {
@@ -10,7 +11,7 @@ void main() {
     expect(test.isAdding, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, []);
+    expect(test.items, []);
 
     await Future.delayed(Duration(milliseconds: 150));
 
@@ -20,7 +21,7 @@ void main() {
     expect(test.isAdding, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, ["Data1", "Data2", "Data3"]);
+    expect(test.items, ["Data1", "Data2", "Data3"]);
   });
 
   test('data list provider on refresh', () async {
@@ -35,7 +36,7 @@ void main() {
     expect(test.isAdding, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, ["Data1", "Data2", "Data3"]);
+    expect(test.items, ["Data1", "Data2", "Data3"]);
 
     await Future.delayed(Duration(milliseconds: 150));
 
@@ -45,7 +46,7 @@ void main() {
     expect(test.isAdding, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, ["Data1", "Data2", "Data3"]);
+    expect(test.items, ["Data1", "Data2", "Data3"]);
   });
 
   test('data list provider on add', () async {
@@ -61,7 +62,7 @@ void main() {
     expect(test.isLoading, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, ["Data1", "Data2", "Data3"]);
+    expect(test.items, ["Data1", "Data2", "Data3"]);
 
     await Future.delayed(Duration(milliseconds: 150));
 
@@ -72,7 +73,7 @@ void main() {
     expect(test.isLoading, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, ["Data1", "Data2", "Data3", "newDataString"]);
+    expect(test.items, ["Data1", "Data2", "Data3", "newDataString"]);
 
     test.add("newDataString1", addToTheStart: true);
 
@@ -83,7 +84,7 @@ void main() {
     expect(test.isLoading, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, ["Data1", "Data2", "Data3", "newDataString"]);
+    expect(test.items, ["Data1", "Data2", "Data3", "newDataString"]);
 
     await Future.delayed(Duration(milliseconds: 150));
 
@@ -94,7 +95,7 @@ void main() {
     expect(test.isLoading, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, [
+    expect(test.items, [
       "newDataString1",
       "Data1",
       "Data2",
@@ -115,7 +116,7 @@ void main() {
     expect(test.isLoading, false);
     expect(test.isAdding, false);
     expect(test.isUpdating, false);
-    expect(test.data, ["Data1", "Data2", "Data3"]);
+    expect(test.items, ["Data1", "Data2", "Data3"]);
 
     await Future.delayed(Duration(milliseconds: 150));
 
@@ -125,7 +126,7 @@ void main() {
     expect(test.isLoading, false);
     expect(test.isAdding, false);
     expect(test.isUpdating, false);
-    expect(test.data, ["Data2", "Data3"]);
+    expect(test.items, ["Data2", "Data3"]);
   });
 
   test('data list provider on update', () async {
@@ -140,7 +141,7 @@ void main() {
     expect(test.isLoading, false);
     expect(test.isAdding, false);
     expect(test.isDeleting, false);
-    expect(test.data, ["Data1", "Data2", "Data3"]);
+    expect(test.items, ["Data1", "Data2", "Data3"]);
 
     await Future.delayed(Duration(milliseconds: 150));
 
@@ -150,7 +151,7 @@ void main() {
     expect(test.isLoading, false);
     expect(test.isAdding, false);
     expect(test.isDeleting, false);
-    expect(test.data, ["newData", "Data2", "Data3"]);
+    expect(test.items, ["newData", "Data2", "Data3"]);
   });
 
   test('data list provider on error', () async {
@@ -161,7 +162,7 @@ void main() {
     expect(test.isAdding, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, []);
+    expect(test.items, []);
 
     await Future.delayed(Duration(milliseconds: 150));
 
@@ -171,15 +172,22 @@ void main() {
     expect(test.isAdding, false);
     expect(test.isDeleting, false);
     expect(test.isUpdating, false);
-    expect(test.data, []);
+    expect(test.items, []);
     expect(test.error.runtimeType, Error);
   });
 }
 
 class TestProvider extends DataListProvider<String> {
   @override
-  Future<List<String>> onFetch() async {
-    return ["Data1", "Data2", "Data3"];
+  Future<RemoteList<String>> onFetch() async {
+    return RemoteList(
+      items: ["Data1", "Data2", "Data3"],
+      totalItem: 3,
+      page: page,
+      pageSize: pageSize,
+      search: search,
+      sortOptions: sortOptions,
+    );
   }
 
   @override
@@ -203,7 +211,7 @@ class TestProvider extends DataListProvider<String> {
 
 class ErrorProvider extends DataListProvider<String> {
   @override
-  Future<List<String>> onFetch() async {
+  Future<RemoteList<String>> onFetch() async {
     throw Error();
   }
 
