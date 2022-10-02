@@ -67,6 +67,9 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Get current page size
   int get pageSize => _data.pageSize;
 
+  /// Get last page
+  int get lastPage => _data.lastPage;
+
   /// Get current search value
   String? get search => _data.search;
 

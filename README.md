@@ -14,8 +14,13 @@ Work with any remote data provider such as REST API, GraphQL,...
 
 DataListProvider supports:
 
-- Fetch/refresh data
-- Create, remove data
+- Fetch/refresh data with predefined `isLoading` state
+- Add data with predefined `isAdding` state
+- Update data with predefined `isUpdating` state
+- Delete data with predefined `isDeleting` state
+- Pagination with predefined `page`, `pageSize`, `lastPage` states
+- Sorting with predefined `sortOptions` state
+- Searching with predefined `search` state and integrated `debounce`
 
 BasicDataProvider supports:
 
