@@ -1,3 +1,7 @@
+## [2.1.0] - Oct 2, 2022.
+
+Splitted [extended_http](https://pub.dev/packages/extended_http)
+
 ## [2.0.0] - Oct 2, 2022.
 
 Basic data provider:
