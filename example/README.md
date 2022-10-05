@@ -6,9 +6,9 @@ Assume we have a `Post` model as following:
 class Post {
     static Future<List<Post>> getAll();
     static Future<Post> getDetail(int id);
-    static Future<Post> delete(int id);
-    static Future<Post> update(Post post);
     static Future<Post> create(Post newPost);
+    static Future<Post> update(Post post);
+    static Future<bool> delete(int id);
 }
 ```
 
@@ -17,24 +17,26 @@ class Post {
 **Step 1. Define a provider**
 
 ```dart
-class PostListProvider extends DataListProvider<Post> {
+class PostListProvider extends DataListProvider<Post> {@override
+
+  @override
+  Future<String> onUpdate(String newData) async {
+    await Future.delayed(Duration(milliseconds: 100));
+    return newData;
+  }
   @override
   Future<List<Post>> onFetch() {
     return Post.getAll();
   }
 
   @override
-  Future<Post> onAdd(Post newItem) {
+  Future<Post> onCreate(Post newItem) {
     return Post.create(newItem);
   }
 
   @override
-  Future<int> onRemove(int index) async {
-    final result = await Post.delete(data[index].id!);
-    if (result.id != data[index].id) {
-      throw Exception('Failed to remove item');
-    }
-    return index;
+  Future<bool> onDelete(Post item) async {
+    return Post.delete(item.id!);
   }
 }
 ```
@@ -87,6 +89,12 @@ class PostDetailProvider extends BasicDataProvider<Post> {
   Future<Post> onUpdate(Post newData) async {
     return Post.update(newData);
   }
+
+  @override
+  Future<bool> onDelete() {
+    return Post.delete(_id);
+  }
+
 }
 ```
 
