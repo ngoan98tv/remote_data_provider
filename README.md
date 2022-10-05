@@ -28,20 +28,7 @@ BasicDataProvider supports:
 - Update data with predefined `isUpdating` state
 - Delete data with predefined `isDeleting` state
 
-Extended HTTP supports:
-
-- Caching API response (for GET requests only)
-- Set request timeout
-- Set request headers (such as: authorization token,...)
-- Set request baseURL (Ex: `http://yourhost.com/api`)
-
 See more in the example
-
-## Dependencies
-
-[http](https://pub.dev/packages/http)
-
-[flutter_cache_manager](https://pub.dev/packages/flutter_cache_manager)
 
 ## References
 

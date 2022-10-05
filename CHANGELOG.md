@@ -1,4 +1,8 @@
-## [2.1.0] - Oct 2, 2022.
+## [2.1.1] - Oct 5, 2022.
+
+Update readme
+
+## [2.1.0] - Oct 5, 2022.
 
 Splitted [extended_http](https://pub.dev/packages/extended_http)
 
