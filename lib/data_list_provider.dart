@@ -14,10 +14,15 @@ abstract class DataListProvider<T> with ChangeNotifier {
   bool _isDeleting = false;
   bool _isMounted = false;
 
+  bool _isInfinity = false;
+
   Timer? _debounceTimer;
 
   /// `manual = true` mean don't fetch data at create time
-  DataListProvider({bool manual = false}) {
+  ///
+  /// `isInfinity = true` will enable infinity list mode
+  DataListProvider({bool manual = false, bool isInfinity = false}) {
+    _isInfinity = isInfinity;
     _isMounted = true;
     notifyListeners();
     if (!manual) {
@@ -58,17 +63,20 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Get status of `data`. Return `true` if `data == null`.
   bool get isEmpty => _data.items.isEmpty;
 
+  /// Check if it is the end of the list
+  bool get isEnd => _data.isEnd;
+
   /// Get total available items
   int get totalItem => _data.totalItem;
 
   /// Get current page
-  int get page => _data.page;
+  int? get page => _data.page;
 
   /// Get current page size
-  int get pageSize => _data.pageSize;
+  int? get pageSize => _data.pageSize;
 
   /// Get last page
-  int get lastPage => _data.lastPage;
+  int? get lastPage => _data.lastPage;
 
   /// Get current search value
   String? get search => _data.search;
@@ -94,10 +102,15 @@ abstract class DataListProvider<T> with ChangeNotifier {
     refresh();
   }
 
+  /// Call `nextPage` to load more data, meaningful in infinity mode
+  void loadMore() => nextPage();
+
   /// Go next page and refresh data
   void nextPage({bool noRefresh = false}) {
-    if (_data.page >= _data.lastPage) return;
-    _data.page += 1;
+    if (_data.lastPage == null ||
+        _data.page == null ||
+        _data.page! >= _data.lastPage!) return;
+    _data.page = _data.page! + 1;
     notifyListeners();
     if (noRefresh) return;
     refresh();
@@ -105,8 +118,8 @@ abstract class DataListProvider<T> with ChangeNotifier {
 
   /// Go previous page and refresh data
   void prevPage({bool noRefresh = false}) {
-    if (_data.page <= 1) return;
-    _data.page -= 1;
+    if (_data.page == null || _data.page! <= 1) return;
+    _data.page = _data.page! - 1;
     notifyListeners();
     if (noRefresh) return;
     refresh();
@@ -234,7 +247,11 @@ abstract class DataListProvider<T> with ChangeNotifier {
   Future<void> _fetchData() async {
     try {
       final result = await onFetch();
-      _data = result;
+      if (_data.page == 1 || !_isInfinity) {
+        _data.combine(result, concatList: false);
+      } else {
+        _data.combine(result, concatList: true);
+      }
     } catch (e) {
       _error = e;
     }

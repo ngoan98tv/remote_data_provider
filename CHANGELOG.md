@@ -1,3 +1,7 @@
+## [2.2.1] - Oct 5, 2022.
+
+Support infinity list
+
 ## [2.1.1] - Oct 5, 2022.
 
 Update readme

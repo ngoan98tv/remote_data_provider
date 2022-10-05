@@ -27,6 +27,7 @@ BasicDataProvider supports:
 - Fetch/refresh data with predefined `isLoading` state
 - Update data with predefined `isUpdating` state
 - Delete data with predefined `isDeleting` state
+- Support infinity list
 
 See more in the example
 

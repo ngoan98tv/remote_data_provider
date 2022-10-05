@@ -19,14 +19,22 @@ class Post {
 ```dart
 class PostListProvider extends DataListProvider<Post> {@override
 
+  PostListProvider() : super(isInfinity: true);
+
+  @override
+  Future<List<Post>> onFetch() {
+    return Post.getAll(
+      page: page,
+      pageSize: pageSize,
+      search: search,
+      sortOptions: sortOptions,
+    );
+  }
+
   @override
   Future<String> onUpdate(String newData) async {
     await Future.delayed(Duration(milliseconds: 100));
     return newData;
-  }
-  @override
-  Future<List<Post>> onFetch() {
-    return Post.getAll();
   }
 
   @override

@@ -1,6 +1,6 @@
 name: remote_data_provider
 description: Help implementing providers easier with predefined abstract classes, special is for working with remote data.
-version: 2.1.1
+version: 2.2.1
 homepage: https://github.com/ngoan98tv/remote_data_provider
 
 environment:
