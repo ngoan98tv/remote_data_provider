@@ -79,6 +79,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Set search value and refresh data
   void setSearch(String val, {bool noRefresh = false, int debounceMs = 500}) {
     _data.search = val;
+    _data.page = 1;
     notifyListeners();
     if (noRefresh) return;
     if (_debounceTimer?.isActive ?? false) _debounceTimer?.cancel();
@@ -114,6 +115,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Set new page size and refresh data
   void setPageSize(int val, {bool noRefresh = false}) {
     _data.pageSize = val;
+    _data.page = 1;
     notifyListeners();
     if (noRefresh) return;
     refresh();
@@ -122,6 +124,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Set new sorts and refresh data
   void setSortOptions(List<SortOption> val, {bool noRefresh = false}) {
     _data.sortOptions = val;
+    _data.page = 1;
     notifyListeners();
     if (noRefresh) return;
     refresh();
