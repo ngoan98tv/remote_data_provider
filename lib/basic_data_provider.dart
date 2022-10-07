@@ -15,9 +15,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
     _isMounted = true;
     notifyListeners();
     if (!manual) {
-      _isLoading = true;
-      notifyListeners();
-      _fetchData();
+      fetch();
     }
   }
 
@@ -51,12 +49,26 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   /// Get status of `data`. Return `true` if `data == null`.
   bool get isEmpty => _data == null;
 
-  /// Refresh value of `data` by recall `fetch` data.
-  Future<void> refresh({bool isQuiet = false}) async {
+  /// Refresh value of `data` by recall `fetch`
+  /// /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
+  Future<void> refresh({bool isQuiet = false}) => fetch(isQuiet: isQuiet);
+
+  /// Fetch data by calling `onFetch`
+  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
+  Future<void> fetch({bool isQuiet = false}) async {
     _error = null;
     _isLoading = true;
     if (_isMounted && !isQuiet) notifyListeners();
-    await _fetchData();
+
+    try {
+      final result = await onFetch();
+      _data = result;
+    } catch (e) {
+      _error = e;
+    }
+
+    _isLoading = false;
+    if (_isMounted) notifyListeners();
   }
 
   /// Delete current data
@@ -102,22 +114,14 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   /// Called when trying to update the data.
   /// Must return the new data, or throw and `error` when it's failed to update.
   @protected
-  Future<T> onUpdate(T newData);
+  Future<T> onUpdate(T newData) async {
+    return newData;
+  }
 
   /// Called when trying to delete the data.
   /// Must return a boolean (`true` mean deleted), or throw and `error` when it's failed.
   @protected
-  Future<bool> onDelete();
-
-  Future<void> _fetchData() async {
-    try {
-      final result = await onFetch();
-      _data = result;
-    } catch (e) {
-      _error = e;
-    }
-
-    _isLoading = false;
-    if (_isMounted) notifyListeners();
+  Future<bool> onDelete() async {
+    return false;
   }
 }

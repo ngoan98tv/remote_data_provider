@@ -6,14 +6,19 @@
 ![PubVersion](https://img.shields.io/pub/v/remote_data_provider)
 ![Issues](https://img.shields.io/github/issues/ngoan98tv/remote_data_provider)
 
-Help implementing providers easier with predefined abstract classes, special is for working with remote data like API.
+Help implementing providers easier with predefined abstract classes, special is for working with remote data like REST API.
 
-## Features
+## Usages
 
-Work with any remote data provider such as REST API, GraphQL,...
+### DataListProvider
 
-DataListProvider supports:
+Good for handling a list of data items, such as list of posts, list of users,...
 
+All you need to do is just extends `DataListProvider` and define `onFetch` method (to call your API or whatever to fetch your data)
+
+Features:
+
+- Supported infinity list with predefined `loadMore` and combine fetched data automatically
 - Fetch/refresh data with predefined `isLoading` state
 - Add data with predefined `isAdding` state
 - Update data with predefined `isUpdating` state
@@ -22,7 +27,11 @@ DataListProvider supports:
 - Sorting with predefined `sortOptions` state
 - Searching with predefined `search` state and integrated `debounce`
 
-BasicDataProvider supports:
+### BasicDataProvider
+
+Good for any kind of data that is not a list, such as user detail, post detail, login, register,...
+
+Features:
 
 - Fetch/refresh data with predefined `isLoading` state
 - Update data with predefined `isUpdating` state

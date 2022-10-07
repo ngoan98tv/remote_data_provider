@@ -1,3 +1,9 @@
+## [2.2.2] - Oct 7, 2022.
+
+Added `fetch` method which equivalent to `refresh` but it is more meaningful in some use cases.
+
+Improve some code blocks.
+
 ## [2.2.1] - Oct 5, 2022.
 
 Support infinity list

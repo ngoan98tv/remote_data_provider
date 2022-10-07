@@ -26,9 +26,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
     _isMounted = true;
     notifyListeners();
     if (!manual) {
-      _isLoading = true;
-      notifyListeners();
-      _fetchData();
+      fetch();
     }
   }
 
@@ -153,25 +151,47 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// Must return the added item,
   /// or throw an `error` if it's failed to add.
   @protected
-  Future<T> onCreate(T newItem);
+  Future<T> onCreate(T newItem) async {
+    return newItem;
+  }
 
   /// Called when trying to update the data.
   /// Must return the new data, or throw and `error` when it's failed to update.
   @protected
-  Future<T> onUpdate(T newData);
+  Future<T> onUpdate(T newData) async {
+    return newData;
+  }
 
   /// Called when trying to delete the data.
   /// Must return a boolean (`true` mean deleted), or throw and `error` when it's failed.
   @protected
-  Future<bool> onDelete(T item);
+  Future<bool> onDelete(T item) async {
+    return false;
+  }
 
   /// Refresh value of `data` by recall `fetch`.
   /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
-  Future<void> refresh({bool isQuiet = false}) async {
+  Future<void> refresh({bool isQuiet = false}) => fetch(isQuiet: isQuiet);
+
+  /// Fetch data by calling `onFetch`
+  /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
+  Future<void> fetch({bool isQuiet = false}) async {
     _error = null;
     _isLoading = true;
     if (_isMounted && !isQuiet) notifyListeners();
-    await _fetchData();
+
+    try {
+      final result = await onFetch();
+      _data.combine(
+        result,
+        concatList: _data.page != 1 && _isInfinity,
+      );
+    } catch (e) {
+      _error = e;
+    }
+
+    _isLoading = false;
+    if (_isMounted) notifyListeners();
   }
 
   /// Add a new item to the end of data list.
@@ -242,21 +262,5 @@ abstract class DataListProvider<T> with ChangeNotifier {
 
     _isUpdating = false;
     if (_isMounted && !isQuiet) notifyListeners();
-  }
-
-  Future<void> _fetchData() async {
-    try {
-      final result = await onFetch();
-      if (_data.page == 1 || !_isInfinity) {
-        _data.combine(result, concatList: false);
-      } else {
-        _data.combine(result, concatList: true);
-      }
-    } catch (e) {
-      _error = e;
-    }
-
-    _isLoading = false;
-    if (_isMounted) notifyListeners();
   }
 }
