@@ -1,3 +1,9 @@
+## [2.3.2] - Oct 18, 2022.
+
+Added new event handler to BasicDataProvider and DataListProvider, such as `onFetchCompleted`, `onFetchFailed`,...
+
+Added `@mustCallsuper` to constructure and dispose method
+
 ## [2.2.2] - Oct 7, 2022.
 
 Added `fetch` method which equivalent to `refresh` but it is more meaningful in some use cases.

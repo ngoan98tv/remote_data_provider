@@ -11,6 +11,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   dynamic _error;
 
   /// `manual = true` mean don't fetch data at create time
+  @mustCallSuper
   BasicDataProvider({bool manual = false}) {
     _isMounted = true;
     notifyListeners();
@@ -20,6 +21,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   }
 
   @override
+  @mustCallSuper
   void dispose() {
     super.dispose();
     _isMounted = false;
@@ -63,8 +65,10 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
     try {
       final result = await onFetch();
       _data = result;
+      onFetchCompleted(result);
     } catch (e) {
       _error = e;
+      onFetchFailed(e);
     }
 
     _isLoading = false;
@@ -80,8 +84,10 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
 
     try {
       _isDeleted = await onDelete();
+      onDeleteCompleted(_isDeleted);
     } catch (e) {
       _error = e;
+      onDeleteFailed(e);
     }
 
     _isDeleting = false;
@@ -98,8 +104,10 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
     try {
       final result = await onUpdate(newData);
       _data = result;
+      onUpdateCompleted(result);
     } catch (e) {
       _error = e;
+      onUpdateFailed(e);
     }
 
     _isUpdating = false;
@@ -111,6 +119,12 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   @protected
   Future<T> onFetch();
 
+  @protected
+  Future<void> onFetchCompleted(T data) async {}
+
+  @protected
+  Future<void> onFetchFailed(dynamic error) async {}
+
   /// Called when trying to update the data.
   /// Must return the new data, or throw and `error` when it's failed to update.
   @protected
@@ -118,10 +132,22 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
     return newData;
   }
 
+  @protected
+  Future<void> onUpdateCompleted(T newData) async {}
+
+  @protected
+  Future<void> onUpdateFailed(dynamic error) async {}
+
   /// Called when trying to delete the data.
   /// Must return a boolean (`true` mean deleted), or throw and `error` when it's failed.
   @protected
   Future<bool> onDelete() async {
     return false;
   }
+
+  @protected
+  Future<void> onDeleteCompleted(bool result) async {}
+
+  @protected
+  Future<void> onDeleteFailed(dynamic error) async {}
 }

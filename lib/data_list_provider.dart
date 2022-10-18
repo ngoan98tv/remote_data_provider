@@ -21,6 +21,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// `manual = true` mean don't fetch data at create time
   ///
   /// `isInfinity = true` will enable infinity list mode
+  @mustCallSuper
   DataListProvider({bool manual = false, bool isInfinity = false}) {
     _isInfinity = isInfinity;
     _isMounted = true;
@@ -31,6 +32,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   }
 
   @override
+  @mustCallSuper
   void dispose() {
     _isMounted = false;
     _debounceTimer?.cancel();
@@ -147,6 +149,12 @@ abstract class DataListProvider<T> with ChangeNotifier {
   @protected
   Future<RemoteList<T>> onFetch();
 
+  @protected
+  Future<void> onFetchCompleted(RemoteList<T> data) async {}
+
+  @protected
+  Future<void> onFetchFailed(dynamic error) async {}
+
   /// Called when trying to add a new item,
   /// Must return the added item,
   /// or throw an `error` if it's failed to add.
@@ -155,6 +163,12 @@ abstract class DataListProvider<T> with ChangeNotifier {
     return newItem;
   }
 
+  @protected
+  Future<void> onCreateCompleted(T newItem) async {}
+
+  @protected
+  Future<void> onCreateFailed(dynamic error) async {}
+
   /// Called when trying to update the data.
   /// Must return the new data, or throw and `error` when it's failed to update.
   @protected
@@ -162,12 +176,24 @@ abstract class DataListProvider<T> with ChangeNotifier {
     return newData;
   }
 
+  @protected
+  Future<void> onUpdateCompleted(T newData) async {}
+
+  @protected
+  Future<void> onUpdateFailed(dynamic error) async {}
+
   /// Called when trying to delete the data.
   /// Must return a boolean (`true` mean deleted), or throw and `error` when it's failed.
   @protected
   Future<bool> onDelete(T item) async {
     return false;
   }
+
+  @protected
+  Future<void> onDeleteCompleted(bool result) async {}
+
+  @protected
+  Future<void> onDeleteFailed(dynamic error) async {}
 
   /// Refresh value of `data` by recall `fetch`.
   /// Set `isQuiet = true` to avoid rendering loading state, default `false`.
@@ -186,8 +212,10 @@ abstract class DataListProvider<T> with ChangeNotifier {
         result,
         concatList: _data.page != 1 && _isInfinity,
       );
+      onFetchCompleted(result);
     } catch (e) {
       _error = e;
+      onFetchFailed(e);
     }
 
     _isLoading = false;
@@ -217,8 +245,10 @@ abstract class DataListProvider<T> with ChangeNotifier {
         _data.items.add(result);
         _data.totalItem += 1;
       }
+      onCreateCompleted(result);
     } catch (e) {
       _error = e;
+      onCreateFailed(e);
     }
 
     _isAdding = false;
@@ -238,8 +268,10 @@ abstract class DataListProvider<T> with ChangeNotifier {
         _data.items.removeAt(index);
         _data.totalItem -= 1;
       }
+      onDeleteCompleted(result);
     } catch (e) {
       _error = e;
+      onDeleteFailed(e);
     }
 
     _isDeleting = false;
@@ -256,8 +288,10 @@ abstract class DataListProvider<T> with ChangeNotifier {
     try {
       final result = await onUpdate(newData);
       _data.items[index] = result;
+      onUpdateCompleted(result);
     } catch (e) {
       _error = e;
+      onUpdateFailed(e);
     }
 
     _isUpdating = false;
