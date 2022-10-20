@@ -15,10 +15,10 @@ class RemoteList<T> {
   int totalItem;
 
   /// Current page
-  int? page;
+  int page;
 
   /// Current page size
-  int? pageSize;
+  int pageSize;
 
   /// Current search string
   String? search;
@@ -27,17 +27,15 @@ class RemoteList<T> {
   List<SortOption>? sortOptions;
 
   /// Get last page based on total available items and page size
-  int? get lastPage => pageSize != null ? (totalItem / pageSize!).ceil() : null;
+  int get lastPage => (totalItem / pageSize).ceil();
 
-  bool get isEnd => (lastPage != null && page != null)
-      ? page! >= lastPage!
-      : items.length >= totalItem;
+  bool get isEnd => page >= lastPage;
 
   RemoteList({
     required this.items,
     required this.totalItem,
-    this.page,
-    this.pageSize,
+    this.page = 1,
+    this.pageSize = 10,
     this.search,
     this.sortOptions,
   });
@@ -54,8 +52,8 @@ class RemoteList<T> {
       items = newList.items;
     }
     totalItem = newList.totalItem;
-    page = newList.page ?? page;
-    pageSize = newList.pageSize ?? pageSize;
+    page = newList.page;
+    pageSize = newList.pageSize;
     search = newList.search ?? search;
     sortOptions = newList.sortOptions ?? sortOptions;
   }

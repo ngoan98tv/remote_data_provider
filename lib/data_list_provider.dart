@@ -5,7 +5,7 @@ import 'package:remote_data_provider/remote_list.dart';
 
 /// A provider to provide a list of data with type `T`
 abstract class DataListProvider<T> with ChangeNotifier {
-  RemoteList<T> _data = RemoteList(items: [], totalItem: 0);
+  late RemoteList<T> _data;
   dynamic _error;
 
   bool _isLoading = false;
@@ -22,9 +22,20 @@ abstract class DataListProvider<T> with ChangeNotifier {
   ///
   /// `isInfinity = true` will enable infinity list mode
   @mustCallSuper
-  DataListProvider({bool manual = false, bool isInfinity = false}) {
+  DataListProvider({
+    bool manual = false,
+    bool isInfinity = false,
+    int initialPage = 0,
+    int initialPageSize = 10,
+  }) {
     _isInfinity = isInfinity;
     _isMounted = true;
+    _data = RemoteList(
+      items: [],
+      totalItem: 0,
+      page: initialPage,
+      pageSize: initialPageSize,
+    );
     notifyListeners();
     if (!manual) {
       fetch();
@@ -70,13 +81,13 @@ abstract class DataListProvider<T> with ChangeNotifier {
   int get totalItem => _data.totalItem;
 
   /// Get current page
-  int? get page => _data.page;
+  int get page => _data.page;
 
   /// Get current page size
-  int? get pageSize => _data.pageSize;
+  int get pageSize => _data.pageSize;
 
   /// Get last page
-  int? get lastPage => _data.lastPage;
+  int get lastPage => _data.lastPage;
 
   /// Get current search value
   String? get search => _data.search;
@@ -107,10 +118,8 @@ abstract class DataListProvider<T> with ChangeNotifier {
 
   /// Go next page and refresh data
   void nextPage({bool noRefresh = false}) {
-    if (_data.lastPage == null ||
-        _data.page == null ||
-        _data.page! >= _data.lastPage!) return;
-    _data.page = _data.page! + 1;
+    if (_data.page >= _data.lastPage) return;
+    _data.page = _data.page + 1;
     notifyListeners();
     if (noRefresh) return;
     refresh();
@@ -118,8 +127,8 @@ abstract class DataListProvider<T> with ChangeNotifier {
 
   /// Go previous page and refresh data
   void prevPage({bool noRefresh = false}) {
-    if (_data.page == null || _data.page! <= 1) return;
-    _data.page = _data.page! - 1;
+    if (_data.page <= 1) return;
+    _data.page = _data.page - 1;
     notifyListeners();
     if (noRefresh) return;
     refresh();
