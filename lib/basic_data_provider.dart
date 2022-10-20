@@ -13,7 +13,7 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
 
   /// `manual = true` mean don't fetch data at create time
   ///
-  /// `awaitListener = true` to keep loading state until listeners (onComplted, onFailed) finish
+  /// `awaitListener = true` to keep loading state until listeners (onCompleted, onFailed) finish
   @mustCallSuper
   BasicDataProvider({bool manual = false, bool awaitListener = false}) {
     _isMounted = true;

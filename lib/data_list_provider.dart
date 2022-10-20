@@ -22,7 +22,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   ///
   /// `isInfinity = true` will enable infinity list mode
   ///
-  /// `awaitListener = true` to keep loading state until listeners (onComplted, onFailed) finish
+  /// `awaitListener = true` to keep loading state until listeners (onCompleted, onFailed) finish
   @mustCallSuper
   DataListProvider({
     bool manual = false,

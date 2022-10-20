@@ -1,3 +1,9 @@
+## [2.4.2] - Oct 20, 2022.
+
+Added `awaitListener` option, set it `true` to keep loading state until listeners (onCompleted, onFailed) finish
+
+Make `page`, `pageSize` never null in data list
+
 ## [2.3.2] - Oct 18, 2022.
 
 Added new event handler to BasicDataProvider and DataListProvider, such as `onFetchCompleted`, `onFetchFailed`,...
