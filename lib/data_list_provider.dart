@@ -13,7 +13,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   bool _isUpdating = false;
   bool _isDeleting = false;
   bool _isMounted = false;
-
+  bool _awaitListener = false;
   bool _isInfinity = false;
 
   Timer? _debounceTimer;
@@ -21,15 +21,19 @@ abstract class DataListProvider<T> with ChangeNotifier {
   /// `manual = true` mean don't fetch data at create time
   ///
   /// `isInfinity = true` will enable infinity list mode
+  ///
+  /// `awaitListener = true` to keep loading state until listeners (onComplted, onFailed) finish
   @mustCallSuper
   DataListProvider({
     bool manual = false,
     bool isInfinity = false,
     int initialPage = 0,
     int initialPageSize = 10,
+    bool awaitListener = false,
   }) {
     _isInfinity = isInfinity;
     _isMounted = true;
+    _awaitListener = awaitListener;
     _data = RemoteList(
       items: [],
       totalItem: 0,
@@ -221,10 +225,18 @@ abstract class DataListProvider<T> with ChangeNotifier {
         result,
         concatList: _data.page != 1 && _isInfinity,
       );
-      onFetchCompleted(result);
+      if (_awaitListener) {
+        await onFetchCompleted(result);
+      } else {
+        onFetchCompleted(result);
+      }
     } catch (e) {
       _error = e;
-      onFetchFailed(e);
+      if (_awaitListener) {
+        await onFetchFailed(e);
+      } else {
+        onFetchFailed(e);
+      }
     }
 
     _isLoading = false;
@@ -254,10 +266,18 @@ abstract class DataListProvider<T> with ChangeNotifier {
         _data.items.add(result);
         _data.totalItem += 1;
       }
-      onCreateCompleted(result);
+      if (_awaitListener) {
+        await onCreateCompleted(result);
+      } else {
+        onCreateCompleted(result);
+      }
     } catch (e) {
       _error = e;
-      onCreateFailed(e);
+      if (_awaitListener) {
+        await onCreateFailed(e);
+      } else {
+        onCreateFailed(e);
+      }
     }
 
     _isAdding = false;
@@ -277,10 +297,18 @@ abstract class DataListProvider<T> with ChangeNotifier {
         _data.items.removeAt(index);
         _data.totalItem -= 1;
       }
-      onDeleteCompleted(result);
+      if (_awaitListener) {
+        await onDeleteCompleted(result);
+      } else {
+        onDeleteCompleted(result);
+      }
     } catch (e) {
       _error = e;
-      onDeleteFailed(e);
+      if (_awaitListener) {
+        await onDeleteFailed(e);
+      } else {
+        onDeleteFailed(e);
+      }
     }
 
     _isDeleting = false;
@@ -297,10 +325,18 @@ abstract class DataListProvider<T> with ChangeNotifier {
     try {
       final result = await onUpdate(newData);
       _data.items[index] = result;
-      onUpdateCompleted(result);
+      if (_awaitListener) {
+        await onUpdateCompleted(result);
+      } else {
+        onUpdateCompleted(result);
+      }
     } catch (e) {
       _error = e;
-      onUpdateFailed(e);
+      if (_awaitListener) {
+        await onUpdateFailed(e);
+      } else {
+        onUpdateFailed(e);
+      }
     }
 
     _isUpdating = false;

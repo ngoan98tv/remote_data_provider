@@ -8,12 +8,16 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
   bool _isDeleting = false;
   bool _isUpdating = false;
   bool _isDeleted = false;
+  bool _awaitListener = false;
   dynamic _error;
 
   /// `manual = true` mean don't fetch data at create time
+  ///
+  /// `awaitListener = true` to keep loading state until listeners (onComplted, onFailed) finish
   @mustCallSuper
-  BasicDataProvider({bool manual = false}) {
+  BasicDataProvider({bool manual = false, bool awaitListener = false}) {
     _isMounted = true;
+    _awaitListener = awaitListener;
     notifyListeners();
     if (!manual) {
       fetch();
@@ -65,10 +69,18 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
     try {
       final result = await onFetch();
       _data = result;
-      onFetchCompleted(result);
+      if (_awaitListener) {
+        await onFetchCompleted(result);
+      } else {
+        onFetchCompleted(result);
+      }
     } catch (e) {
       _error = e;
-      onFetchFailed(e);
+      if (_awaitListener) {
+        await onFetchFailed(e);
+      } else {
+        onFetchFailed(e);
+      }
     }
 
     _isLoading = false;
@@ -84,10 +96,18 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
 
     try {
       _isDeleted = await onDelete();
-      onDeleteCompleted(_isDeleted);
+      if (_awaitListener) {
+        await onDeleteCompleted(_isDeleted);
+      } else {
+        onDeleteCompleted(_isDeleted);
+      }
     } catch (e) {
       _error = e;
-      onDeleteFailed(e);
+      if (_awaitListener) {
+        await onDeleteFailed(e);
+      } else {
+        onDeleteFailed(e);
+      }
     }
 
     _isDeleting = false;
@@ -104,10 +124,18 @@ abstract class BasicDataProvider<T> with ChangeNotifier {
     try {
       final result = await onUpdate(newData);
       _data = result;
-      onUpdateCompleted(result);
+      if (_awaitListener) {
+        await onUpdateCompleted(result);
+      } else {
+        onUpdateCompleted(result);
+      }
     } catch (e) {
       _error = e;
-      onUpdateFailed(e);
+      if (_awaitListener) {
+        await onUpdateFailed(e);
+      } else {
+        onUpdateFailed(e);
+      }
     }
 
     _isUpdating = false;
