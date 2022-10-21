@@ -27,7 +27,7 @@ abstract class DataListProvider<T> with ChangeNotifier {
   DataListProvider({
     bool manual = false,
     bool isInfinity = false,
-    int initialPage = 0,
+    int initialPage = 1,
     int initialPageSize = 10,
     bool awaitListener = false,
   }) {

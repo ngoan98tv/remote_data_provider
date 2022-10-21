@@ -1,3 +1,7 @@
+## [2.4.3] - Oct 21, 2022.
+
+Fix wrong `initialPage` value in data list provider
+
 ## [2.4.2] - Oct 20, 2022.
 
 Added `awaitListener` option, set it `true` to keep loading state until listeners (onCompleted, onFailed) finish
